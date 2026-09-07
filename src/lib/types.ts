@@ -1,30 +1,56 @@
 export interface Service {
   id: string
   name: string
-  duration: number // minutes
-  price: number // euros
   description: string
+  duration_minutes: number
+  price: number
+  position: number
+  active: boolean
+  featured: boolean
 }
 
 export interface Appointment {
   id: string
-  serviceId: string
-  serviceName: string
-  duration: number
+  service_id: string | null
+  service_name: string
+  duration_minutes: number
   price: number
-  date: string // YYYY-MM-DD
-  time: string // HH:MM
-  clientName: string
-  clientPhone: string
-  createdAt: string // ISO
+  appt_date: string // YYYY-MM-DD
+  appt_time: string // HH:MM(:SS)
+  client_name: string
+  client_phone: string
   status: 'confirmed' | 'cancelled'
+  created_at: string
 }
 
 export interface BlockedSlot {
   id: string
-  date: string // YYYY-MM-DD
-  time: string // HH:MM
-  reason?: string
+  block_date: string
+  block_time: string
+  reason: string | null
+}
+
+export interface DayHours {
+  weekday: number // 0 domingo .. 6 sábado
+  closed: boolean
+  morning_start: string | null
+  morning_end: string | null
+  afternoon_start: string | null
+  afternoon_end: string | null
+}
+
+export interface PublicSettings {
+  business_name: string
+  instagram_handle: string
+  whatsapp_number: string
+  address: string
+  profile_photo_url: string
+}
+
+export interface GalleryImage {
+  id: string
+  url: string
+  position: number
 }
 
 export interface DayOption {
@@ -33,4 +59,9 @@ export interface DayOption {
   dayNumber: string
   month: string
   isToday: boolean
+}
+
+export interface Interval {
+  start: number
+  end: number
 }

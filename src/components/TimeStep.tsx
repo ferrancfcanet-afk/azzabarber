@@ -1,10 +1,12 @@
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { Sun, Sunset } from 'lucide-react'
-import { getCandidateSlots, isSlotAvailable } from '../lib/dates'
-import { getOccupiedIntervals } from '../lib/availability'
+import { getOccupiedIntervals } from '../lib/api'
+import { getCandidateSlots, isSlotAvailable, parseDateKey } from '../lib/dates'
+import type { DayHours } from '../lib/types'
 
 interface Props {
   date: string
+  hours: DayHours[]
   durationMinutes: number
   selected: string | null
   onSelect: (time: string) => void
@@ -12,24 +14,46 @@ interface Props {
   refreshKey?: number
 }
 
-export default function TimeStep({ date, durationMinutes, selected, onSelect, refreshKey }: Props) {
-  const { morning, afternoon } = useMemo(() => {
-    const occupied = getOccupiedIntervals(date)
-    const all = getCandidateSlots(durationMinutes).map((time) => ({
-      time,
-      available: isSlotAvailable(date, time, durationMinutes, occupied),
-    }))
-    return {
-      morning: all.filter((s) => s.time < '14:00'),
-      afternoon: all.filter((s) => s.time >= '14:00'),
+export default function TimeStep({ date, hours, durationMinutes, selected, onSelect, refreshKey }: Props) {
+  const [loading, setLoading] = useState(true)
+  const [slots, setSlots] = useState<{ time: string; available: boolean }[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    const weekday = parseDateKey(date).getDay()
+    const dayHours = hours.find((h) => h.weekday === weekday)
+    const candidates = getCandidateSlots(durationMinutes, dayHours)
+
+    getOccupiedIntervals(date)
+      .then((occupied) => {
+        if (cancelled) return
+        setSlots(
+          candidates.map((time) => ({
+            time,
+            available: isSlotAvailable(date, time, durationMinutes, occupied),
+          })),
+        )
+      })
+      .catch(() => {
+        if (!cancelled) setSlots([])
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, durationMinutes, refreshKey])
+  }, [date, hours, durationMinutes, refreshKey])
+
+  const morning = slots.filter((s) => s.time < '14:00')
+  const afternoon = slots.filter((s) => s.time >= '14:00')
 
   const renderGroup = (
     label: string,
     Icon: typeof Sun,
-    slots: { time: string; available: boolean }[],
+    group: { time: string; available: boolean }[],
   ) => (
     <div>
       <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/35 mb-2.5">
@@ -37,7 +61,7 @@ export default function TimeStep({ date, durationMinutes, selected, onSelect, re
         {label}
       </div>
       <div className="grid grid-cols-4 gap-2">
-        {slots.map(({ time, available }) => {
+        {group.map(({ time, available }) => {
           const isActive = selected === time
           return (
             <button
@@ -59,6 +83,10 @@ export default function TimeStep({ date, durationMinutes, selected, onSelect, re
       </div>
     </div>
   )
+
+  if (loading) {
+    return <p className="text-sm text-white/35 text-center py-6">Consultando disponibilidad…</p>
+  }
 
   const noSlots = morning.length === 0 && afternoon.length === 0
 

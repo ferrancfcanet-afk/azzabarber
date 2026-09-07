@@ -1,13 +1,19 @@
 import { useMemo } from 'react'
 import { getUpcomingDays } from '../lib/dates'
+import type { DayHours } from '../lib/types'
 
 interface Props {
+  hours: DayHours[]
   selected: string | null
   onSelect: (date: string) => void
 }
 
-export default function DateStep({ selected, onSelect }: Props) {
-  const days = useMemo(() => getUpcomingDays(), [])
+export default function DateStep({ hours, selected, onSelect }: Props) {
+  const days = useMemo(() => getUpcomingDays(hours), [hours])
+
+  if (days.length === 0) {
+    return <p className="text-sm text-white/45 text-center py-6">No hay días disponibles ahora mismo.</p>
+  }
 
   return (
     <div className="flex gap-2 overflow-x-auto no-scrollbar snap-x-mandatory pb-1 -mx-5 px-5">

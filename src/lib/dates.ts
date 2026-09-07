@@ -1,19 +1,11 @@
-import {
-  AFTERNOON_END,
-  AFTERNOON_START,
-  CLOSED_WEEKDAY,
-  DAYS_TO_SHOW,
-  MORNING_END,
-  MORNING_START,
-  SLOT_STEP_MINUTES,
-} from './constants'
-import type { DayOption } from './types'
+import type { DayHours, DayOption, Interval } from './types'
 
 const WEEKDAYS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb']
 const MONTHS = [
   'ene', 'feb', 'mar', 'abr', 'may', 'jun',
   'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
 ]
+const SLOT_STEP_MINUTES = 15
 
 export function toDateKey(d: Date): string {
   const y = d.getFullYear()
@@ -27,15 +19,23 @@ export function parseDateKey(key: string): Date {
   return new Date(y, m - 1, d)
 }
 
-/** Próximos N días hábiles (excluyendo domingos), empezando hoy. */
-export function getUpcomingDays(count: number = DAYS_TO_SHOW): DayOption[] {
+/** Normaliza "10:00:00" (formato time de Postgres) a "10:00". */
+export function normalizeTime(t: string): string {
+  return t.slice(0, 5)
+}
+
+/** Próximos N días hábiles según el horario configurado, empezando hoy. */
+export function getUpcomingDays(hours: DayHours[], count = 7): DayOption[] {
   const days: DayOption[] = []
   const cursor = new Date()
   cursor.setHours(0, 0, 0, 0)
   const today = toDateKey(cursor)
+  const closedWeekdays = new Set(hours.filter((h) => h.closed).map((h) => h.weekday))
 
-  while (days.length < count) {
-    if (cursor.getDay() !== CLOSED_WEEKDAY) {
+  let guard = 0
+  while (days.length < count && guard < 60) {
+    guard++
+    if (!closedWeekdays.has(cursor.getDay())) {
       const key = toDateKey(cursor)
       days.push({
         date: key,
@@ -57,18 +57,24 @@ function minutesToTime(mins: number): string {
 }
 
 function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number)
+  const [h, m] = normalizeTime(time).split(':').map(Number)
   return h * 60 + m
 }
 
-/** Genera las franjas horarias candidatas para un día y duración de servicio dados. */
-export function getCandidateSlots(durationMinutes: number): string[] {
-  const slots: string[] = []
-  const ranges: [string, string][] = [
-    [MORNING_START, MORNING_END],
-    [AFTERNOON_START, AFTERNOON_END],
-  ]
+export { timeToMinutes as timeStrToMinutes }
 
+/** Franjas candidatas para un día (según su horario) y duración de servicio. */
+export function getCandidateSlots(durationMinutes: number, dayHours: DayHours | undefined): string[] {
+  if (!dayHours || dayHours.closed) return []
+  const ranges: [string, string][] = []
+  if (dayHours.morning_start && dayHours.morning_end) {
+    ranges.push([dayHours.morning_start, dayHours.morning_end])
+  }
+  if (dayHours.afternoon_start && dayHours.afternoon_end) {
+    ranges.push([dayHours.afternoon_start, dayHours.afternoon_end])
+  }
+
+  const slots: string[] = []
   for (const [start, end] of ranges) {
     const startMin = timeToMinutes(start)
     const endMin = timeToMinutes(end)
@@ -79,12 +85,6 @@ export function getCandidateSlots(durationMinutes: number): string[] {
   return slots
 }
 
-export interface Interval {
-  start: number
-  end: number
-}
-
-/** true si [aStart,aEnd) se solapa con [bStart,bEnd) */
 function overlaps(aStart: number, aEnd: number, bStart: number, bEnd: number): boolean {
   return aStart < bEnd && bStart < aEnd
 }
@@ -98,7 +98,6 @@ export function isSlotAvailable(
   const start = timeToMinutes(time)
   const end = start + durationMinutes
 
-  // No permitir horas pasadas si el día es hoy
   const now = new Date()
   if (date === toDateKey(now)) {
     const nowMinutes = now.getHours() * 60 + now.getMinutes()
@@ -106,10 +105,6 @@ export function isSlotAvailable(
   }
 
   return !occupied.some((iv) => overlaps(start, end, iv.start, iv.end))
-}
-
-export function timeStrToMinutes(time: string): number {
-  return timeToMinutes(time)
 }
 
 export function formatLongDate(key: string): string {
@@ -124,3 +119,7 @@ export function formatLongDate(key: string): string {
   const text = `${weekdayFull} ${d.getDate()} de ${monthFull}`
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
+
+export const WEEKDAY_NAMES_FULL = [
+  'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
+]

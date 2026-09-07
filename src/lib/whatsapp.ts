@@ -1,23 +1,22 @@
-import { BARBER_WHATSAPP } from './constants'
 import { formatLongDate } from './dates'
 import type { Appointment } from './types'
 
 export function buildWhatsAppMessage(appt: Appointment): string {
   return [
-    `¡Hola azzabarber! 💈 Quiero confirmar mi cita:`,
+    `¡Hola! 💈 Quiero confirmar mi cita:`,
     ``,
-    `✂️ Servicio: ${appt.serviceName}`,
-    `📅 Día: ${formatLongDate(appt.date)}`,
-    `🕒 Hora: ${appt.time}`,
+    `✂️ Servicio: ${appt.service_name}`,
+    `📅 Día: ${formatLongDate(appt.appt_date)}`,
+    `🕒 Hora: ${appt.appt_time.slice(0, 5)}`,
     `💶 Precio: ${appt.price}€`,
-    `👤 Nombre: ${appt.clientName}`,
-    `📱 Teléfono: ${appt.clientPhone}`,
+    `👤 Nombre: ${appt.client_name}`,
+    `📱 Teléfono: ${appt.client_phone}`,
     ``,
     `¡Gracias!`,
   ].join('\n')
 }
 
-export function buildWhatsAppUrl(appt: Appointment): string {
+export function buildWhatsAppUrl(appt: Appointment, whatsappNumber: string): string {
   const message = encodeURIComponent(buildWhatsAppMessage(appt))
-  return `https://wa.me/${BARBER_WHATSAPP}?text=${message}`
+  return `https://wa.me/${whatsappNumber}?text=${message}`
 }

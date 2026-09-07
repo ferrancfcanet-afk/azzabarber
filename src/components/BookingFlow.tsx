@@ -6,7 +6,8 @@ import DateStep from './DateStep'
 import TimeStep from './TimeStep'
 import ClientForm from './ClientForm'
 import ConfirmationCard from './ConfirmationCard'
-import { genId, saveAppointment } from '../lib/storage'
+import { createAppointment } from '../lib/api'
+import { useAppData } from '../lib/AppDataContext'
 import type { Appointment, Service } from '../lib/types'
 
 const STEP_LABELS = ['Servicio', 'Día', 'Hora', 'Datos']
@@ -58,6 +59,7 @@ function Stepper({ step }: { step: number }) {
 }
 
 export default function BookingFlow() {
+  const { services, hours, settings } = useAppData()
   const [step, setStep] = useState(0)
   const [service, setService] = useState<Service | null>(null)
   const [date, setDate] = useState<string | null>(null)
@@ -66,6 +68,8 @@ export default function BookingFlow() {
   const [phone, setPhone] = useState('')
   const [appointment, setAppointment] = useState<Appointment | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const canProceed = () => {
     if (step === 0) return !!service
@@ -88,25 +92,28 @@ export default function BookingFlow() {
     setStep(step - 1)
   }
 
-  const confirmBooking = () => {
-    if (!service || !date || !time) return
-    const appt: Appointment = {
-      id: genId(),
-      serviceId: service.id,
-      serviceName: service.name,
-      duration: service.duration,
-      price: service.price,
-      date,
-      time,
-      clientName: name.trim(),
-      clientPhone: phone.trim(),
-      createdAt: new Date().toISOString(),
-      status: 'confirmed',
+  const confirmBooking = async () => {
+    if (!service || !date || !time || submitting) return
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const appt = await createAppointment({
+        service,
+        date,
+        time,
+        clientName: name.trim(),
+        clientPhone: phone.trim(),
+      })
+      setAppointment(appt)
+      setRefreshKey((k) => k + 1)
+      fireConfetti()
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : 'No se ha podido reservar. Inténtalo de nuevo.',
+      )
+    } finally {
+      setSubmitting(false)
     }
-    saveAppointment(appt)
-    setAppointment(appt)
-    setRefreshKey((k) => k + 1)
-    fireConfetti()
   }
 
   const resetFlow = () => {
@@ -117,13 +124,14 @@ export default function BookingFlow() {
     setName('')
     setPhone('')
     setAppointment(null)
+    setSubmitError(null)
   }
 
-  if (appointment) {
+  if (appointment && settings) {
     return (
       <section className="px-5 mt-8">
         <div className="panel rounded-2xl p-5 shadow-card">
-          <ConfirmationCard appointment={appointment} onReset={resetFlow} />
+          <ConfirmationCard appointment={appointment} settings={settings} onReset={resetFlow} />
         </div>
       </section>
     )
@@ -139,12 +147,15 @@ export default function BookingFlow() {
         <Stepper step={step} />
 
         <div key={step} className="animate-fade-in min-h-[220px]">
-          {step === 0 && <ServiceStep selected={service} onSelect={setService} />}
-          {step === 1 && <DateStep selected={date} onSelect={setDate} />}
+          {step === 0 && (
+            <ServiceStep services={services} selected={service} onSelect={setService} />
+          )}
+          {step === 1 && <DateStep hours={hours} selected={date} onSelect={setDate} />}
           {step === 2 && service && date && (
             <TimeStep
               date={date}
-              durationMinutes={service.duration}
+              hours={hours}
+              durationMinutes={service.duration_minutes}
               selected={time}
               onSelect={setTime}
               refreshKey={refreshKey}
@@ -163,6 +174,8 @@ export default function BookingFlow() {
           )}
         </div>
 
+        {submitError && <p className="text-xs text-red-400 mt-4 text-center">{submitError}</p>}
+
         <div className="flex items-center gap-3 mt-6">
           {step > 0 && (
             <button
@@ -175,15 +188,15 @@ export default function BookingFlow() {
           )}
           <button
             onClick={goNext}
-            disabled={!canProceed()}
+            disabled={!canProceed() || submitting}
             className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all duration-150 ${
-              canProceed()
+              canProceed() && !submitting
                 ? 'bg-violet text-white shadow-button active:scale-[0.98]'
                 : 'bg-white/[0.04] text-white/25 cursor-not-allowed'
             }`}
           >
-            {step === 3 ? 'Confirmar cita' : 'Siguiente'}
-            {step < 3 && <ArrowRight size={16} />}
+            {submitting ? 'Reservando…' : step === 3 ? 'Confirmar cita' : 'Siguiente'}
+            {step < 3 && !submitting && <ArrowRight size={16} />}
           </button>
         </div>
       </div>
