@@ -1,16 +1,18 @@
 import { CalendarPlus, CheckCircle2, Download, MapPin, MessageCircle, RotateCcw } from 'lucide-react'
-import { ADDRESS, MAPS_URL } from '../lib/constants'
 import { formatLongDate } from '../lib/dates'
 import { buildGoogleCalendarUrl, downloadIcsFile } from '../lib/ics'
 import { buildWhatsAppUrl } from '../lib/whatsapp'
-import type { Appointment } from '../lib/types'
+import type { Appointment, PublicSettings } from '../lib/types'
 
 interface Props {
   appointment: Appointment
+  settings: PublicSettings
   onReset: () => void
 }
 
-export default function ConfirmationCard({ appointment, onReset }: Props) {
+export default function ConfirmationCard({ appointment, settings, onReset }: Props) {
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`
+
   return (
     <div className="animate-slide-up space-y-6">
       <div className="flex flex-col items-center text-center gap-3 pt-1">
@@ -27,22 +29,22 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
 
       <div className="rounded-xl p-4 space-y-2 bg-white/[0.03] border border-white/8 text-sm">
         <p className="text-bone/90">
-          <span className="text-white/35">Servicio </span> {appointment.serviceName}
+          <span className="text-white/35">Servicio </span> {appointment.service_name}
         </p>
         <p className="text-bone/90">
-          <span className="text-white/35">Día </span> {formatLongDate(appointment.date)}
+          <span className="text-white/35">Día </span> {formatLongDate(appointment.appt_date)}
         </p>
         <p className="text-bone/90">
-          <span className="text-white/35">Hora </span> {appointment.time}
+          <span className="text-white/35">Hora </span> {appointment.appt_time.slice(0, 5)}
         </p>
         <p className="text-bone/90">
-          <span className="text-white/35">Cliente </span> {appointment.clientName}
+          <span className="text-white/35">Cliente </span> {appointment.client_name}
         </p>
       </div>
 
       <div className="space-y-2.5">
         <a
-          href={buildWhatsAppUrl(appointment)}
+          href={buildWhatsAppUrl(appointment, settings.whatsapp_number)}
           target="_blank"
           rel="noreferrer"
           className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-[#25D366] py-3.5 text-sm font-semibold text-ink-950 active:scale-[0.98] transition-transform"
@@ -53,7 +55,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
 
         <div className="grid grid-cols-2 gap-2.5">
           <a
-            href={buildGoogleCalendarUrl(appointment)}
+            href={buildGoogleCalendarUrl(appointment, settings.business_name, settings.address)}
             target="_blank"
             rel="noreferrer"
             className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 py-3 text-xs font-semibold text-bone/80 active:bg-white/[0.04] transition-colors"
@@ -62,7 +64,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
             Calendar
           </a>
           <button
-            onClick={() => downloadIcsFile(appointment)}
+            onClick={() => downloadIcsFile(appointment, settings.business_name, settings.address)}
             className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 py-3 text-xs font-semibold text-bone/80 active:bg-white/[0.04] transition-colors"
           >
             <Download size={15} className="text-white/50" />
@@ -71,7 +73,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
         </div>
 
         <a
-          href={MAPS_URL}
+          href={mapsUrl}
           target="_blank"
           rel="noreferrer"
           className="w-full flex items-center gap-3 rounded-xl border border-white/8 p-3.5 active:bg-white/[0.03] transition-colors"
@@ -81,7 +83,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
           </div>
           <div className="min-w-0 text-left">
             <p className="text-[10px] uppercase tracking-wider text-white/35">Ubicación</p>
-            <p className="text-xs text-bone/80 truncate">{ADDRESS}</p>
+            <p className="text-xs text-bone/80 truncate">{settings.address}</p>
           </div>
         </a>
 

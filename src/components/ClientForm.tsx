@@ -39,7 +39,7 @@ export default function ClientForm({
         <div className="flex items-center gap-2.5 text-sm text-bone">
           <Clock size={14} className="text-white/35 shrink-0" />
           <span>
-            {time} <span className="text-white/35">· {service.duration} min</span>
+            {time} <span className="text-white/35">· {service.duration_minutes} min</span>
           </span>
         </div>
       </div>

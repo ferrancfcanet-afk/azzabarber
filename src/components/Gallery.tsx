@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { GALLERY_IMAGES } from '../lib/constants'
+import { useAppData } from '../lib/AppDataContext'
 
 export default function Gallery() {
+  const { gallery } = useAppData()
   const [active, setActive] = useState<number | null>(null)
+
+  if (gallery.length === 0) return null
 
   return (
     <section className="px-5 mt-1">
@@ -11,15 +14,15 @@ export default function Gallery() {
         Últimos trabajos
       </h2>
       <div className="flex gap-2.5 overflow-x-auto no-scrollbar snap-x-mandatory pb-1 -mx-5 px-5">
-        {GALLERY_IMAGES.map((img, i) => (
+        {gallery.map((img, i) => (
           <button
-            key={img.src}
+            key={img.id}
             onClick={() => setActive(i)}
             className="snap-center shrink-0 w-28 h-36 rounded-xl overflow-hidden border border-white/8 active:opacity-80 transition-opacity"
           >
             <img
-              src={img.src}
-              alt={img.alt}
+              src={img.url}
+              alt="Trabajo realizado"
               className="w-full h-full object-cover grayscale contrast-[1.05]"
               loading="lazy"
             />
@@ -40,8 +43,8 @@ export default function Gallery() {
             <X size={18} />
           </button>
           <img
-            src={GALLERY_IMAGES[active].src}
-            alt={GALLERY_IMAGES[active].alt}
+            src={gallery[active].url}
+            alt="Trabajo realizado"
             className="max-h-[80vh] max-w-full rounded-xl object-contain"
             onClick={(e) => e.stopPropagation()}
           />

@@ -1,4 +1,3 @@
-import { ADDRESS, BRAND_NAME } from './constants'
 import { parseDateKey } from './dates'
 import type { Appointment } from './types'
 
@@ -21,26 +20,26 @@ function toUtcStamp(date: Date): string {
 }
 
 function getStartEndDates(appt: Appointment): { start: Date; end: Date } {
-  const day = parseDateKey(appt.date)
-  const [h, m] = appt.time.split(':').map(Number)
+  const day = parseDateKey(appt.appt_date)
+  const [h, m] = appt.appt_time.slice(0, 5).split(':').map(Number)
   const start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), h, m)
-  const end = new Date(start.getTime() + appt.duration * 60_000)
+  const end = new Date(start.getTime() + appt.duration_minutes * 60_000)
   return { start, end }
 }
 
-export function buildGoogleCalendarUrl(appt: Appointment): string {
+export function buildGoogleCalendarUrl(appt: Appointment, businessName: string, address: string): string {
   const { start, end } = getStartEndDates(appt)
   const params = new URLSearchParams({
     action: 'TEMPLATE',
-    text: `${appt.serviceName} · ${BRAND_NAME}`,
+    text: `${appt.service_name} · ${businessName}`,
     dates: `${toUtcStamp(start)}/${toUtcStamp(end)}`,
-    details: `Cita en ${BRAND_NAME} — ${appt.serviceName}. Cliente: ${appt.clientName}.`,
-    location: ADDRESS,
+    details: `Cita en ${businessName} — ${appt.service_name}. Cliente: ${appt.client_name}.`,
+    location: address,
   })
   return `https://calendar.google.com/calendar/render?${params.toString()}`
 }
 
-export function buildIcsContent(appt: Appointment): string {
+export function buildIcsContent(appt: Appointment, businessName: string, address: string): string {
   const { start, end } = getStartEndDates(appt)
   const now = new Date()
   return [
@@ -54,20 +53,22 @@ export function buildIcsContent(appt: Appointment): string {
     `DTSTAMP:${toUtcStamp(now)}`,
     `DTSTART:${toUtcStamp(start)}`,
     `DTEND:${toUtcStamp(end)}`,
-    `SUMMARY:${appt.serviceName} · ${BRAND_NAME}`,
-    `DESCRIPTION:Cita en ${BRAND_NAME} — ${appt.serviceName}. Cliente: ${appt.clientName}.`,
-    `LOCATION:${ADDRESS}`,
+    `SUMMARY:${appt.service_name} · ${businessName}`,
+    `DESCRIPTION:Cita en ${businessName} — ${appt.service_name}. Cliente: ${appt.client_name}.`,
+    `LOCATION:${address}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n')
 }
 
-export function downloadIcsFile(appt: Appointment): void {
-  const blob = new Blob([buildIcsContent(appt)], { type: 'text/calendar;charset=utf-8' })
+export function downloadIcsFile(appt: Appointment, businessName: string, address: string): void {
+  const blob = new Blob([buildIcsContent(appt, businessName, address)], {
+    type: 'text/calendar;charset=utf-8',
+  })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `azzabarber-cita-${appt.date}.ics`
+  link.download = `azzabarber-cita-${appt.appt_date}.ics`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
