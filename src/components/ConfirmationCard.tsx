@@ -14,8 +14,8 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
   return (
     <div className="animate-slide-up space-y-6">
       <div className="flex flex-col items-center text-center gap-3 pt-1">
-        <div className="relative grid place-items-center w-16 h-16 rounded-full bg-gradient-to-br from-violet-glow/25 to-violet-deep/15 shadow-glow">
-          <CheckCircle2 size={30} className="text-violet-glow" strokeWidth={1.8} />
+        <div className="grid place-items-center w-14 h-14 rounded-full bg-violet/15">
+          <CheckCircle2 size={28} className="text-violet-light" strokeWidth={1.8} />
         </div>
         <div>
           <h3 className="font-display text-3xl tracking-wide text-bone">¡Cita reservada!</h3>
@@ -25,7 +25,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
         </div>
       </div>
 
-      <div className="rounded-2xl p-4 space-y-2 bg-white/[0.03] border border-white/[0.06] text-sm">
+      <div className="rounded-xl p-4 space-y-2 bg-white/[0.03] border border-white/8 text-sm">
         <p className="text-bone/90">
           <span className="text-white/35">Servicio </span> {appointment.serviceName}
         </p>
@@ -45,7 +45,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
           href={buildWhatsAppUrl(appointment)}
           target="_blank"
           rel="noreferrer"
-          className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1fb355] py-3.5 text-sm font-semibold text-ink-950 shadow-lift active:scale-[0.98] transition-transform"
+          className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-[#25D366] py-3.5 text-sm font-semibold text-ink-950 active:scale-[0.98] transition-transform"
         >
           <MessageCircle size={18} strokeWidth={2.2} />
           Confirmar por WhatsApp
@@ -56,16 +56,16 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
             href={buildGoogleCalendarUrl(appointment)}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-center gap-1.5 rounded-2xl glass py-3 text-xs font-semibold text-bone/85 active:scale-95 transition-transform"
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 py-3 text-xs font-semibold text-bone/80 active:bg-white/[0.04] transition-colors"
           >
-            <CalendarPlus size={15} className="text-violet-glow" />
+            <CalendarPlus size={15} className="text-white/50" />
             Calendar
           </a>
           <button
             onClick={() => downloadIcsFile(appointment)}
-            className="flex items-center justify-center gap-1.5 rounded-2xl glass py-3 text-xs font-semibold text-bone/85 active:scale-95 transition-transform"
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 py-3 text-xs font-semibold text-bone/80 active:bg-white/[0.04] transition-colors"
           >
-            <Download size={15} className="text-violet-glow" />
+            <Download size={15} className="text-white/50" />
             Descargar .ics
           </button>
         </div>
@@ -74,10 +74,10 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
           href={MAPS_URL}
           target="_blank"
           rel="noreferrer"
-          className="w-full flex items-center gap-3 rounded-2xl glass p-3.5 active:scale-[0.98] transition-transform"
+          className="w-full flex items-center gap-3 rounded-xl border border-white/8 p-3.5 active:bg-white/[0.03] transition-colors"
         >
-          <div className="grid place-items-center w-9 h-9 rounded-full bg-gold/15 shrink-0">
-            <MapPin size={16} className="text-gold" />
+          <div className="grid place-items-center w-9 h-9 rounded-full bg-white/[0.05] shrink-0">
+            <MapPin size={16} className="text-white/50" />
           </div>
           <div className="min-w-0 text-left">
             <p className="text-[10px] uppercase tracking-wider text-white/35">Ubicación</p>
@@ -87,7 +87,7 @@ export default function ConfirmationCard({ appointment, onReset }: Props) {
 
         <button
           onClick={onReset}
-          className="w-full flex items-center justify-center gap-1.5 rounded-2xl py-3 text-xs font-semibold text-white/35 hover:text-white/65 transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-semibold text-white/35 hover:text-white/60 transition-colors"
         >
           <RotateCcw size={13} />
           Reservar otra cita

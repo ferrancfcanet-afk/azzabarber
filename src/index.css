@@ -8,38 +8,21 @@ html {
 
 body {
   @apply bg-ink-950 text-bone antialiased;
-  background-image:
-    radial-gradient(circle at 20% -8%, rgba(169, 118, 250, 0.16), transparent 45%),
-    radial-gradient(circle at 88% 6%, rgba(205, 164, 94, 0.07), transparent 40%),
-    radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.08), transparent 55%);
-  background-attachment: fixed;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
   letter-spacing: -0.01em;
 }
 
 ::selection {
-  background: rgba(169, 118, 250, 0.35);
+  background: rgba(133, 68, 240, 0.35);
 }
 
-/* Textura sutil tipo grano, para dar sensación de material / print premium */
-.grain-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.035;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* Scrollbars discretos */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(169, 118, 250, 0.3);
+  background: rgba(133, 68, 240, 0.3);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-track {
@@ -54,24 +37,6 @@ body {
   scrollbar-width: none;
 }
 
-.glass {
-  background: linear-gradient(165deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.07);
-}
-
-.glass-strong {
-  background: linear-gradient(165deg, rgba(255,255,255,0.065), rgba(255,255,255,0.02));
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.09);
-}
-
-.hairline {
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
 .snap-x-mandatory {
   scroll-snap-type: x mandatory;
 }
@@ -79,18 +44,15 @@ body {
   scroll-snap-align: center;
 }
 
-.text-gradient-gold {
-  background: linear-gradient(120deg, #f3dfa8 0%, #cda45e 45%, #f3dfa8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Superficie plana estándar de la app: sin blur, sin glow de color */
+.panel {
+  background: #141418;
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.shimmer-text {
-  background: linear-gradient(100deg, #a976fa 0%, #f0abfc 25%, #a976fa 50%, #a976fa 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 3.5s linear infinite;
+.row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.row:last-child {
+  border-bottom: none;
 }

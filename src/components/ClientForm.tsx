@@ -23,29 +23,23 @@ export default function ClientForm({
 }: Props) {
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl p-4 space-y-3 bg-gradient-to-br from-violet-glow/10 to-transparent border border-violet-glow/20">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/70 mb-0.5">
-          Resumen de tu cita
+      <div className="rounded-xl p-4 space-y-2.5 bg-white/[0.03] border border-white/8">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35 mb-0.5">
+          Resumen
         </p>
-        <div className="flex items-center gap-3 text-sm text-bone">
-          <span className="grid place-items-center w-7 h-7 rounded-full bg-white/[0.06] shrink-0">
-            <Scissors size={13} className="text-violet-glow" />
-          </span>
-          <span className="flex-1 font-medium">{service.name}</span>
-          <span className="text-violet-glow font-semibold font-display text-lg">{service.price}€</span>
+        <div className="flex items-center gap-2.5 text-sm text-bone">
+          <Scissors size={14} className="text-white/35 shrink-0" />
+          <span className="flex-1">{service.name}</span>
+          <span className="font-semibold">{service.price}€</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-bone">
-          <span className="grid place-items-center w-7 h-7 rounded-full bg-white/[0.06] shrink-0">
-            <Calendar size={13} className="text-violet-glow" />
-          </span>
-          <span className="font-medium">{formatLongDate(date)}</span>
+        <div className="flex items-center gap-2.5 text-sm text-bone">
+          <Calendar size={14} className="text-white/35 shrink-0" />
+          <span>{formatLongDate(date)}</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-bone">
-          <span className="grid place-items-center w-7 h-7 rounded-full bg-white/[0.06] shrink-0">
-            <Clock size={13} className="text-violet-glow" />
-          </span>
-          <span className="font-medium">
-            {time} <span className="text-white/40 font-normal">· {service.duration} min</span>
+        <div className="flex items-center gap-2.5 text-sm text-bone">
+          <Clock size={14} className="text-white/35 shrink-0" />
+          <span>
+            {time} <span className="text-white/35">· {service.duration} min</span>
           </span>
         </div>
       </div>
@@ -58,7 +52,7 @@ export default function ClientForm({
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="Tu nombre"
-            className="w-full rounded-2xl glass pl-11 pr-4 py-3.5 text-sm text-bone placeholder-white/30 outline-none focus:border-violet-glow/60 focus:shadow-glow-sm transition-all"
+            className="w-full rounded-xl bg-white/[0.03] border border-white/8 pl-11 pr-4 py-3.5 text-sm text-bone placeholder-white/30 outline-none focus:border-violet/60 transition-colors"
           />
         </label>
         <label className="block relative">
@@ -69,7 +63,7 @@ export default function ClientForm({
             value={phone}
             onChange={(e) => onPhoneChange(e.target.value)}
             placeholder="Tu WhatsApp: 600 000 000"
-            className="w-full rounded-2xl glass pl-11 pr-4 py-3.5 text-sm text-bone placeholder-white/30 outline-none focus:border-violet-glow/60 focus:shadow-glow-sm transition-all"
+            className="w-full rounded-xl bg-white/[0.03] border border-white/8 pl-11 pr-4 py-3.5 text-sm text-bone placeholder-white/30 outline-none focus:border-violet/60 transition-colors"
           />
         </label>
       </div>
