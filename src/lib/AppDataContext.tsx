@@ -27,7 +27,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
+    // Solo la carga inicial (tick === 0) bloquea el render con la pantalla
+    // de "Cargando…". Un refresh() posterior (p.ej. tras guardar algo en el
+    // panel de administración) actualiza los datos en segundo plano sin
+    // desmontar el resto de la app — si no, cualquier guardado en el panel
+    // haría parpadear toda la app de vuelta a "Cargando…" y perdería la
+    // pestaña/estado en la que estaba el dueño.
+    if (tick === 0) setLoading(true)
     setError(null)
     Promise.all([getPublicSettings(), getBusinessHours(), getActiveServices(), getGalleryImages()])
       .then(([s, h, sv, g]) => {
