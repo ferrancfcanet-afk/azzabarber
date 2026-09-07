@@ -12,57 +12,41 @@ import type { Appointment, Service } from '../lib/types'
 const STEP_LABELS = ['Servicio', 'Día', 'Hora', 'Datos']
 
 function fireConfetti() {
-  const colors = ['#a976fa', '#cda45e', '#f5f3ff', '#7c3aed']
   confetti({
-    particleCount: 90,
-    spread: 75,
-    startVelocity: 38,
+    particleCount: 70,
+    spread: 70,
+    startVelocity: 32,
     origin: { y: 0.65 },
-    colors,
+    colors: ['#8544f0', '#c9a6fb', '#f5f3ff'],
     zIndex: 999,
   })
-  setTimeout(
-    () =>
-      confetti({
-        particleCount: 60,
-        spread: 100,
-        origin: { y: 0.5 },
-        colors,
-        zIndex: 999,
-      }),
-    180,
-  )
 }
 
 function Stepper({ step }: { step: number }) {
   return (
-    <div className="flex items-center mb-7 px-1">
+    <div className="flex items-center mb-6">
       {STEP_LABELS.map((label, i) => (
         <div key={label} className="flex items-center flex-1 last:flex-none">
           <div className="flex flex-col items-center gap-1.5">
             <div
-              className={`grid place-items-center w-8 h-8 rounded-full text-xs font-bold shrink-0 transition-all duration-300 ${
-                i < step
-                  ? 'bg-gradient-to-br from-violet-glow to-violet-deep text-white shadow-glow-sm'
-                  : i === step
-                    ? 'bg-gradient-to-br from-violet-glow to-violet-deep text-white shadow-glow-sm ring-4 ring-violet-glow/20'
-                    : 'bg-white/[0.04] text-white/30 border border-white/10'
+              className={`grid place-items-center w-7 h-7 rounded-full text-[11px] font-bold shrink-0 ${
+                i <= step ? 'bg-violet text-white' : 'bg-ink-700 text-white/30'
               }`}
             >
-              {i < step ? <Check size={14} strokeWidth={3} /> : i + 1}
+              {i < step ? <Check size={12} strokeWidth={3} /> : i + 1}
             </div>
             <span
               className={`text-[9px] uppercase tracking-wider font-semibold whitespace-nowrap ${
-                i <= step ? 'text-white/70' : 'text-white/25'
+                i <= step ? 'text-white/65' : 'text-white/25'
               }`}
             >
               {label}
             </span>
           </div>
           {i < STEP_LABELS.length - 1 && (
-            <div className="flex-1 h-[2px] mx-1.5 -mt-4 rounded-full overflow-hidden bg-white/[0.06]">
+            <div className="flex-1 h-px mx-1.5 -mt-4 bg-ink-700">
               <div
-                className="h-full bg-gradient-to-r from-violet-deep to-violet-glow transition-all duration-500 ease-out"
+                className="h-full bg-violet transition-all duration-300"
                 style={{ width: i < step ? '100%' : '0%' }}
               />
             </div>
@@ -138,7 +122,7 @@ export default function BookingFlow() {
   if (appointment) {
     return (
       <section className="px-5 mt-8">
-        <div className="glass-strong rounded-[28px] p-5 shadow-card">
+        <div className="panel rounded-2xl p-5 shadow-card">
           <ConfirmationCard appointment={appointment} onReset={resetFlow} />
         </div>
       </section>
@@ -146,15 +130,12 @@ export default function BookingFlow() {
   }
 
   return (
-    <section className="px-5 mt-9 animate-slide-up" style={{ animationDelay: '400ms' }}>
-      <div className="flex items-center gap-2.5 mb-3.5">
-        <span className="h-px w-4 bg-gradient-to-r from-transparent to-violet-glow/50" />
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
-          Reserva tu cita
-        </h2>
-      </div>
+    <section className="px-5 mt-8">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40 mb-3">
+        Reserva tu cita
+      </h2>
 
-      <div className="glass-strong rounded-[28px] p-5 shadow-card">
+      <div className="panel rounded-2xl p-5 shadow-card">
         <Stepper step={step} />
 
         <div key={step} className="animate-fade-in min-h-[220px]">
@@ -182,11 +163,11 @@ export default function BookingFlow() {
           )}
         </div>
 
-        <div className="flex items-center gap-3 mt-7">
+        <div className="flex items-center gap-3 mt-6">
           {step > 0 && (
             <button
               onClick={goBack}
-              className="grid place-items-center w-12 h-12 rounded-2xl glass text-white/70 active:scale-95 transition-transform shrink-0"
+              className="grid place-items-center w-12 h-12 rounded-xl border border-white/10 text-white/60 active:scale-95 transition-transform shrink-0"
               aria-label="Atrás"
             >
               <ArrowLeft size={18} />
@@ -195,9 +176,9 @@ export default function BookingFlow() {
           <button
             onClick={goNext}
             disabled={!canProceed()}
-            className={`relative flex-1 flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-semibold tracking-wide transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all duration-150 ${
               canProceed()
-                ? 'bg-gradient-to-r from-violet-glow via-violet-deep to-violet-ink text-white shadow-glow active:scale-[0.98]'
+                ? 'bg-violet text-white shadow-button active:scale-[0.98]'
                 : 'bg-white/[0.04] text-white/25 cursor-not-allowed'
             }`}
           >

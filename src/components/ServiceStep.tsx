@@ -1,4 +1,4 @@
-import { Check, Clock, Scissors, Sparkles, Zap } from 'lucide-react'
+import { Clock, Scissors, Sparkles, Zap } from 'lucide-react'
 import { SERVICES } from '../lib/constants'
 import type { Service } from '../lib/types'
 
@@ -17,7 +17,7 @@ interface Props {
 
 export default function ServiceStep({ selected, onSelect }: Props) {
   return (
-    <div className="space-y-3">
+    <div>
       {SERVICES.map((service) => {
         const Icon = ICONS[service.id] ?? Scissors
         const isActive = selected?.id === service.id
@@ -26,45 +26,38 @@ export default function ServiceStep({ selected, onSelect }: Props) {
           <button
             key={service.id}
             onClick={() => onSelect(service)}
-            className={`relative w-full text-left rounded-2xl p-4 flex items-center gap-3.5 transition-all duration-200 ${
-              isActive
-                ? 'bg-gradient-to-br from-violet-glow/15 to-violet-deep/10 border border-violet-glow/60 shadow-glow-sm'
-                : 'glass active:scale-[0.98]'
+            className={`row w-full text-left py-4 flex items-center gap-3.5 pl-3 pr-1 -mx-1 rounded-lg transition-colors ${
+              isActive ? 'bg-violet/[0.08]' : ''
             }`}
           >
-            {isRecommended && !isActive && (
-              <span className="absolute -top-2 right-4 text-[9px] font-bold uppercase tracking-wider text-ink-950 bg-gradient-to-r from-gold-light to-gold px-2 py-0.5 rounded-full shadow-glow-gold">
-                Recomendado
-              </span>
-            )}
-            <div
-              className={`relative grid place-items-center w-12 h-12 rounded-full shrink-0 transition-colors ${
-                isActive
-                  ? 'bg-gradient-to-br from-violet-glow to-violet-deep shadow-glow-sm'
-                  : 'bg-white/[0.05] border border-white/10'
-              }`}
-            >
-              <Icon size={20} className={isActive ? 'text-white' : 'text-white/60'} />
-            </div>
+            <span
+              className={`w-[3px] self-stretch rounded-full ${isActive ? 'bg-violet' : 'bg-transparent'}`}
+            />
+            <Icon size={18} className={isActive ? 'text-violet-light' : 'text-white/40'} />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-bone tracking-tight">{service.name}</p>
-              <p className="text-xs text-white/45 mt-0.5 leading-snug">{service.description}</p>
-              <div className="flex items-center gap-1 mt-1.5 text-[11px] text-white/35">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-bone">{service.name}</p>
+                {isRecommended && (
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-violet-light border border-violet/40 rounded-full px-1.5 py-0.5">
+                    Top
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-white/40 mt-0.5 leading-snug">{service.description}</p>
+              <div className="flex items-center gap-1 mt-1 text-[11px] text-white/30">
                 <Clock size={11} />
                 <span>{service.duration} min</span>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-1.5 pl-1">
-              <span className="font-display text-2xl text-violet-glow tracking-wide leading-none">
+            <div className="flex flex-col items-end gap-2 pl-1">
+              <span className="font-display text-xl text-bone tracking-wide leading-none">
                 {service.price}€
               </span>
               <span
-                className={`grid place-items-center w-5 h-5 rounded-full transition-all ${
-                  isActive ? 'bg-violet-glow scale-100' : 'bg-transparent scale-0'
+                className={`w-4 h-4 rounded-full border ${
+                  isActive ? 'bg-violet border-violet' : 'border-white/20'
                 }`}
-              >
-                <Check size={12} className="text-ink-950" strokeWidth={3} />
-              </span>
+              />
             </div>
           </button>
         )

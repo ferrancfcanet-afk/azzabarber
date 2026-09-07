@@ -10,22 +10,22 @@ export default function DateStep({ selected, onSelect }: Props) {
   const days = useMemo(() => getUpcomingDays(), [])
 
   return (
-    <div className="flex gap-2.5 overflow-x-auto no-scrollbar snap-x-mandatory pb-1 -mx-5 px-5">
+    <div className="flex gap-2 overflow-x-auto no-scrollbar snap-x-mandatory pb-1 -mx-5 px-5">
       {days.map((day) => {
         const isActive = selected === day.date
         return (
           <button
             key={day.date}
             onClick={() => onSelect(day.date)}
-            className={`snap-center shrink-0 w-[4.4rem] rounded-2xl py-3.5 flex flex-col items-center gap-1 transition-all duration-200 ${
+            className={`snap-center shrink-0 w-[4.2rem] rounded-xl py-3 flex flex-col items-center gap-1 border transition-colors ${
               isActive
-                ? 'bg-gradient-to-b from-violet-glow to-violet-deep shadow-glow-sm scale-[1.03]'
-                : 'glass active:scale-95'
+                ? 'bg-violet border-violet'
+                : 'bg-transparent border-white/10 active:bg-white/[0.04]'
             }`}
           >
             <span
               className={`text-[10px] uppercase tracking-wider font-semibold ${
-                isActive ? 'text-white/85' : 'text-white/35'
+                isActive ? 'text-white/80' : 'text-white/35'
               }`}
             >
               {day.isToday ? 'Hoy' : day.weekday}
