@@ -76,12 +76,14 @@ export default function AdminPanel({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-ink-950/95 backdrop-blur-md overflow-y-auto animate-fade-in">
+    <div className="fixed inset-0 z-[100] bg-ink-950/97 backdrop-blur-xl overflow-y-auto animate-fade-in">
       <div className="max-w-md mx-auto min-h-full px-5 py-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={20} className="text-violet-glow" />
-            <h2 className="font-display text-xl tracking-wide text-white">Modo Barbero</h2>
+          <div className="flex items-center gap-2.5">
+            <span className="grid place-items-center w-8 h-8 rounded-full bg-gradient-to-br from-violet-glow/25 to-violet-deep/15">
+              <ShieldCheck size={16} className="text-violet-glow" />
+            </span>
+            <h2 className="font-display text-2xl tracking-wide text-bone">Modo Barbero</h2>
           </div>
           <button
             onClick={onClose}
@@ -93,16 +95,17 @@ export default function AdminPanel({ onClose }: Props) {
         </div>
 
         {!unlocked ? (
-          <div className="glass rounded-2xl p-6 flex flex-col items-center gap-4 mt-10">
-            <div className="grid place-items-center w-14 h-14 rounded-full bg-violet-glow/20">
-              <Lock size={24} className="text-violet-glow" />
+          <div className="glass-strong rounded-[28px] p-7 flex flex-col items-center gap-4 mt-12 shadow-card">
+            <div className="grid place-items-center w-14 h-14 rounded-full bg-gradient-to-br from-violet-glow/25 to-violet-deep/15 shadow-glow-sm">
+              <Lock size={22} className="text-violet-glow" />
             </div>
-            <p className="text-sm text-white/60 text-center">
+            <p className="text-sm text-white/50 text-center max-w-[220px]">
               Introduce el PIN para acceder a las citas y gestionar horarios.
             </p>
             <input
               type="password"
               inputMode="numeric"
+              maxLength={8}
               value={pinInput}
               onChange={(e) => {
                 setPinInput(e.target.value)
@@ -110,15 +113,15 @@ export default function AdminPanel({ onClose }: Props) {
               }}
               onKeyDown={(e) => e.key === 'Enter' && handlePinSubmit()}
               placeholder="PIN"
-              className={`w-32 text-center tracking-[0.5em] rounded-xl glass px-4 py-3 text-lg text-white outline-none ${
-                error ? 'border-red-500/70' : 'focus:border-violet-glow/70'
+              className={`w-40 text-center tracking-[0.35em] rounded-2xl glass px-4 py-3.5 text-lg text-bone outline-none transition-colors ${
+                error ? 'border-red-500/60' : 'focus:border-violet-glow/60'
               }`}
               autoFocus
             />
             {error && <p className="text-xs text-red-400">PIN incorrecto</p>}
             <button
               onClick={handlePinSubmit}
-              className="w-full rounded-xl bg-gradient-to-r from-violet-glow to-violet-deep py-3 text-sm font-semibold text-white shadow-glow"
+              className="w-full rounded-2xl bg-gradient-to-r from-violet-glow via-violet-deep to-violet-ink py-3.5 text-sm font-semibold text-white shadow-glow active:scale-[0.98] transition-transform"
             >
               Entrar
             </button>
@@ -126,22 +129,22 @@ export default function AdminPanel({ onClose }: Props) {
         ) : (
           <div className="space-y-6">
             {/* Bloquear horario */}
-            <div className="glass rounded-2xl p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3 flex items-center gap-1.5">
-                <CalendarClock size={14} /> Bloquear horario
+            <div className="glass-strong rounded-[24px] p-4 shadow-card">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/70 mb-3 flex items-center gap-1.5">
+                <CalendarClock size={13} /> Bloquear horario
               </p>
               <div className="grid grid-cols-2 gap-2.5 mb-2.5">
                 <input
                   type="date"
                   value={blockDate}
                   onChange={(e) => setBlockDate(e.target.value)}
-                  className="rounded-xl glass px-3 py-2.5 text-sm text-white outline-none focus:border-violet-glow/70 [color-scheme:dark]"
+                  className="rounded-xl glass px-3 py-2.5 text-sm text-bone outline-none focus:border-violet-glow/60 [color-scheme:dark]"
                 />
                 <input
                   type="time"
                   value={blockTime}
                   onChange={(e) => setBlockTime(e.target.value)}
-                  className="rounded-xl glass px-3 py-2.5 text-sm text-white outline-none focus:border-violet-glow/70 [color-scheme:dark]"
+                  className="rounded-xl glass px-3 py-2.5 text-sm text-bone outline-none focus:border-violet-glow/60 [color-scheme:dark]"
                 />
               </div>
               <input
@@ -149,12 +152,12 @@ export default function AdminPanel({ onClose }: Props) {
                 value={blockReason}
                 onChange={(e) => setBlockReason(e.target.value)}
                 placeholder="Motivo (opcional)"
-                className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-violet-glow/70 mb-2.5"
+                className="w-full rounded-xl glass px-3 py-2.5 text-sm text-bone placeholder-white/30 outline-none focus:border-violet-glow/60 mb-2.5"
               />
               <button
                 onClick={handleBlock}
                 disabled={!blockDate || !blockTime}
-                className="w-full rounded-xl py-2.5 text-sm font-semibold bg-white/5 text-white/80 disabled:text-white/20 enabled:hover:bg-white/10 transition-colors"
+                className="w-full rounded-xl py-2.5 text-sm font-semibold bg-white/[0.04] text-white/80 disabled:text-white/20 enabled:hover:bg-white/[0.08] transition-colors"
               >
                 Bloquear franja
               </button>
@@ -169,7 +172,7 @@ export default function AdminPanel({ onClose }: Props) {
                         key={b.id}
                         className="flex items-center justify-between text-xs bg-white/[0.03] rounded-lg px-3 py-2"
                       >
-                        <span className="text-white/60">
+                        <span className="text-white/55">
                           {b.date} · {b.time}
                           {b.reason ? ` — ${b.reason}` : ''}
                         </span>
@@ -178,7 +181,7 @@ export default function AdminPanel({ onClose }: Props) {
                             removeBlockedSlot(b.id)
                             refresh()
                           }}
-                          className="text-white/40 hover:text-red-400"
+                          className="text-white/35 hover:text-red-400 transition-colors"
                           aria-label="Desbloquear"
                         >
                           <Trash2 size={13} />
@@ -191,30 +194,30 @@ export default function AdminPanel({ onClose }: Props) {
 
             {/* Citas */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/70 mb-3 px-1">
                 Citas guardadas ({appointments.length})
               </p>
               {grouped.length === 0 && (
-                <p className="text-sm text-white/40 text-center py-8">Todavía no hay citas.</p>
+                <p className="text-sm text-white/35 text-center py-10">Todavía no hay citas.</p>
               )}
               <div className="space-y-4">
                 {grouped.map(([date, list]) => (
                   <div key={date}>
-                    <p className="text-xs text-violet-glow font-semibold mb-2">
+                    <p className="text-xs text-violet-glow font-semibold mb-2 px-1">
                       {formatLongDate(date)}
                     </p>
                     <div className="space-y-2">
                       {list.map((appt) => (
-                        <div key={appt.id} className="glass rounded-xl p-3.5">
+                        <div key={appt.id} className="glass rounded-2xl p-3.5">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                              <p className="text-sm font-semibold text-white truncate">
+                              <p className="text-sm font-semibold text-bone truncate">
                                 {appt.time} · {appt.serviceName}
                               </p>
-                              <p className="text-xs text-white/50 mt-0.5">{appt.clientName}</p>
+                              <p className="text-xs text-white/45 mt-0.5">{appt.clientName}</p>
                               <a
                                 href={`tel:${appt.clientPhone}`}
-                                className="text-xs text-white/40 flex items-center gap-1 mt-0.5"
+                                className="text-xs text-white/35 flex items-center gap-1 mt-0.5"
                               >
                                 <Phone size={11} /> {appt.clientPhone}
                               </a>
@@ -222,8 +225,8 @@ export default function AdminPanel({ onClose }: Props) {
                             <span
                               className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full ${
                                 appt.status === 'confirmed'
-                                  ? 'bg-violet-glow/20 text-violet-glow'
-                                  : 'bg-white/10 text-white/40'
+                                  ? 'bg-violet-glow/15 text-violet-glow'
+                                  : 'bg-white/[0.06] text-white/40'
                               }`}
                             >
                               {appt.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}
@@ -236,7 +239,7 @@ export default function AdminPanel({ onClose }: Props) {
                                   updateAppointmentStatus(appt.id, 'cancelled')
                                   refresh()
                                 }}
-                                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-white/5 py-2 text-xs text-white/70"
+                                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-white/[0.04] py-2 text-xs text-white/65 hover:bg-white/[0.08] transition-colors"
                               >
                                 <XCircle size={13} /> Cancelar
                               </button>
@@ -246,7 +249,7 @@ export default function AdminPanel({ onClose }: Props) {
                                   updateAppointmentStatus(appt.id, 'confirmed')
                                   refresh()
                                 }}
-                                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-white/5 py-2 text-xs text-white/70"
+                                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-white/[0.04] py-2 text-xs text-white/65 hover:bg-white/[0.08] transition-colors"
                               >
                                 <CheckCircle2 size={13} /> Reactivar
                               </button>
@@ -256,7 +259,7 @@ export default function AdminPanel({ onClose }: Props) {
                                 deleteAppointment(appt.id)
                                 refresh()
                               }}
-                              className="flex items-center justify-center gap-1.5 rounded-lg bg-red-500/10 text-red-400 py-2 px-3 text-xs"
+                              className="flex items-center justify-center gap-1.5 rounded-xl bg-red-500/10 text-red-400 py-2 px-3 text-xs hover:bg-red-500/15 transition-colors"
                             >
                               <Trash2 size={13} />
                             </button>

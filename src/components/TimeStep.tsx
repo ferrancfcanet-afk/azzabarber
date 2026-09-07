@@ -32,8 +32,8 @@ export default function TimeStep({ date, durationMinutes, selected, onSelect, re
     slots: { time: string; available: boolean }[],
   ) => (
     <div>
-      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">
-        <Icon size={13} />
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-2.5">
+        <Icon size={12} className="text-gold/70" />
         {label}
       </div>
       <div className="grid grid-cols-4 gap-2">
@@ -44,15 +44,18 @@ export default function TimeStep({ date, durationMinutes, selected, onSelect, re
               key={time}
               disabled={!available}
               onClick={() => onSelect(time)}
-              className={`rounded-xl py-2.5 text-sm font-medium transition-all ${
+              className={`relative rounded-xl py-2.5 text-sm font-semibold transition-all duration-150 ${
                 isActive
-                  ? 'bg-violet-glow text-white shadow-glow-sm'
+                  ? 'bg-gradient-to-b from-violet-glow to-violet-deep text-white shadow-glow-sm scale-[1.04]'
                   : available
-                    ? 'glass text-white/80 active:scale-95'
-                    : 'bg-white/[0.02] text-white/20 line-through cursor-not-allowed border border-white/5'
+                    ? 'glass text-white/75 active:scale-95'
+                    : 'bg-white/[0.015] text-white/15 cursor-not-allowed border border-white/5'
               }`}
             >
               {time}
+              {!available && (
+                <span className="absolute inset-x-3 top-1/2 h-px bg-white/10 -translate-y-1/2" />
+              )}
             </button>
           )
         })}
@@ -63,7 +66,7 @@ export default function TimeStep({ date, durationMinutes, selected, onSelect, re
   const noSlots = morning.length === 0 && afternoon.length === 0
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {noSlots && (
         <p className="text-sm text-white/50 text-center py-6">
           No hay franjas disponibles para este servicio ese día.

@@ -3,12 +3,12 @@ import type { Service } from './types'
 // ── Configuración del negocio ────────────────────────────────────────────
 // Actualiza estos valores con los datos reales del barbero.
 export const BRAND_NAME = 'AZZA BARBER'
-export const INSTAGRAM_HANDLE = 'azabarber'
+export const INSTAGRAM_HANDLE = 'azzabarber'
 export const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_HANDLE}`
-export const BARBER_WHATSAPP = '34600000000' // TODO: número real en formato internacional sin '+'
+export const BARBER_WHATSAPP = '34722443789' // +34 722 44 37 89, formato internacional sin '+'
 export const ADDRESS = 'Carrer Sant Francesc de Paula, 75, Mataró, Barcelona'
 export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`
-export const ADMIN_PIN = '2580' // PIN del panel de barbero (cámbialo si quieres)
+export const ADMIN_PIN = '070926' // PIN del panel de barbero
 
 export const SERVICES: Service[] = [
   {
