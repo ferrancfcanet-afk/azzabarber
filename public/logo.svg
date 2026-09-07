@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 118">
+  <rect width="120" height="118" rx="22" fill="#0a0a0d"/>
+  <defs>
+    <linearGradient id="legGrad" x1="0%" y1="0%" x2="10%" y2="100%">
+      <stop offset="0%" stop-color="#d6bcfb"/>
+      <stop offset="38%" stop-color="#a976fa"/>
+      <stop offset="75%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#3b0f78"/>
+    </linearGradient>
+    <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c8798"/>
+      <stop offset="14%" stop-color="#eef2f6"/>
+      <stop offset="50%" stop-color="#fbfcfe"/>
+      <stop offset="86%" stop-color="#dbe2e9"/>
+      <stop offset="100%" stop-color="#6b7684"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="60" cy="112" rx="34" ry="4" fill="#000000" opacity="0.28"/>
+  <path d="M60 6 L17 108 L33 108 L60 36 L87 108 L103 108 Z" fill="url(#legGrad)" stroke="#1a0533" stroke-width="0.5"/>
+  <g transform="rotate(-3 60 65)">
+    <rect x="30" y="61" width="60" height="8" rx="2.2" fill="url(#bladeGrad)"/>
+    <rect x="30" y="61" width="60" height="8" rx="2.2" fill="none" stroke="#4b5563" stroke-width="0.4" opacity="0.6"/>
+    <rect x="41.5" y="63.6" width="9" height="2.8" rx="1.4" fill="#161821" opacity="0.85"/>
+    <rect x="69.5" y="63.6" width="9" height="2.8" rx="1.4" fill="#161821" opacity="0.85"/>
+    <rect x="30" y="61.4" width="60" height="1.1" rx="0.5" fill="#ffffff" opacity="0.8"/>
+  </g>
+</svg>
