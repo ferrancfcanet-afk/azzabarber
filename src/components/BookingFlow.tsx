@@ -59,7 +59,7 @@ function Stepper({ step }: { step: number }) {
 }
 
 export default function BookingFlow() {
-  const { services, hours, settings } = useAppData()
+  const { services, scheduleWeeks, settings, getHoursForDate } = useAppData()
   const [step, setStep] = useState(0)
   const [service, setService] = useState<Service | null>(null)
   const [date, setDate] = useState<string | null>(null)
@@ -150,11 +150,18 @@ export default function BookingFlow() {
           {step === 0 && (
             <ServiceStep services={services} selected={service} onSelect={setService} />
           )}
-          {step === 1 && <DateStep hours={hours} selected={date} onSelect={setDate} />}
+          {step === 1 && settings && (
+            <DateStep
+              scheduleWeeks={scheduleWeeks}
+              settings={settings}
+              selected={date}
+              onSelect={setDate}
+            />
+          )}
           {step === 2 && service && date && (
             <TimeStep
               date={date}
-              hours={hours}
+              getHoursForDate={getHoursForDate}
               durationMinutes={service.duration_minutes}
               selected={time}
               onSelect={setTime}
