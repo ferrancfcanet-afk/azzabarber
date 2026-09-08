@@ -1,22 +1,25 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import { getActiveServices, getBusinessHours, getGalleryImages, getPublicSettings } from './api'
-import type { DayHours, GalleryImage, PublicSettings, Service } from './types'
+import { getActiveServices, getGalleryImages, getPublicSettings, getScheduleWeeks } from './api'
+import { resolveDayHours } from './dates'
+import type { DayHours, GalleryImage, PublicSettings, ScheduleWeekDay, Service } from './types'
 
 interface AppData {
   settings: PublicSettings | null
-  hours: DayHours[]
+  scheduleWeeks: ScheduleWeekDay[]
   services: Service[]
   gallery: GalleryImage[]
   loading: boolean
   error: string | null
   refresh: () => void
+  /** Horario ya resuelto (según la rotación configurada) para una fecha dada. */
+  getHoursForDate: (dateKey: string) => DayHours | undefined
 }
 
 const AppDataContext = createContext<AppData | null>(null)
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<PublicSettings | null>(null)
-  const [hours, setHours] = useState<DayHours[]>([])
+  const [scheduleWeeks, setScheduleWeeks] = useState<ScheduleWeekDay[]>([])
   const [services, setServices] = useState<Service[]>([])
   const [gallery, setGallery] = useState<GalleryImage[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,11 +38,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     // pestaña/estado en la que estaba el dueño.
     if (tick === 0) setLoading(true)
     setError(null)
-    Promise.all([getPublicSettings(), getBusinessHours(), getActiveServices(), getGalleryImages()])
-      .then(([s, h, sv, g]) => {
+    Promise.all([getPublicSettings(), getScheduleWeeks(), getActiveServices(), getGalleryImages()])
+      .then(([s, w, sv, g]) => {
         if (cancelled) return
         setSettings(s)
-        setHours(h)
+        setScheduleWeeks(w)
         setServices(sv)
         setGallery(g)
       })
@@ -54,8 +57,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     }
   }, [tick])
 
+  const getHoursForDate = useCallback(
+    (dateKey: string) =>
+      settings
+        ? resolveDayHours(dateKey, scheduleWeeks, settings.rotation_weeks, settings.rotation_anchor)
+        : undefined,
+    [scheduleWeeks, settings],
+  )
+
   return (
-    <AppDataContext.Provider value={{ settings, hours, services, gallery, loading, error, refresh }}>
+    <AppDataContext.Provider
+      value={{ settings, scheduleWeeks, services, gallery, loading, error, refresh, getHoursForDate }}
+    >
       {children}
     </AppDataContext.Provider>
   )

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Sun, Sunset } from 'lucide-react'
 import { getOccupiedIntervals } from '../lib/api'
-import { getCandidateSlots, isSlotAvailable, parseDateKey } from '../lib/dates'
+import { getCandidateSlots, isSlotAvailable } from '../lib/dates'
 import type { DayHours } from '../lib/types'
 
 interface Props {
   date: string
-  hours: DayHours[]
+  getHoursForDate: (dateKey: string) => DayHours | undefined
   durationMinutes: number
   selected: string | null
   onSelect: (time: string) => void
@@ -14,15 +14,21 @@ interface Props {
   refreshKey?: number
 }
 
-export default function TimeStep({ date, hours, durationMinutes, selected, onSelect, refreshKey }: Props) {
+export default function TimeStep({
+  date,
+  getHoursForDate,
+  durationMinutes,
+  selected,
+  onSelect,
+  refreshKey,
+}: Props) {
   const [loading, setLoading] = useState(true)
   const [slots, setSlots] = useState<{ time: string; available: boolean }[]>([])
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    const weekday = parseDateKey(date).getDay()
-    const dayHours = hours.find((h) => h.weekday === weekday)
+    const dayHours = getHoursForDate(date)
     const candidates = getCandidateSlots(durationMinutes, dayHours)
 
     getOccupiedIntervals(date)
@@ -45,7 +51,7 @@ export default function TimeStep({ date, hours, durationMinutes, selected, onSel
     return () => {
       cancelled = true
     }
-  }, [date, hours, durationMinutes, refreshKey])
+  }, [date, getHoursForDate, durationMinutes, refreshKey])
 
   const morning = slots.filter((s) => s.time < '14:00')
   const afternoon = slots.filter((s) => s.time >= '14:00')

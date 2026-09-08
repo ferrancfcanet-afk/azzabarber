@@ -8,7 +8,7 @@ import {
   removeBlockedSlot,
   updateAppointmentStatus,
 } from '../../lib/api'
-import { formatLongDate, getUpcomingDays, parseDateKey } from '../../lib/dates'
+import { formatLongDate, getUpcomingDays } from '../../lib/dates'
 import { useAppData } from '../../lib/AppDataContext'
 import type { Appointment, BlockedSlot } from '../../lib/types'
 
@@ -20,7 +20,7 @@ function rangeMinutes(start: string | null, end: string | null): number {
 }
 
 export default function AdminAppointments() {
-  const { hours } = useAppData()
+  const { scheduleWeeks, settings, getHoursForDate } = useAppData()
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [blocked, setBlocked] = useState<BlockedSlot[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,9 +54,10 @@ export default function AdminAppointments() {
   }, [appointments])
 
   const occupancy = useMemo(() => {
-    const days = getUpcomingDays(hours, 7)
+    if (!settings) return []
+    const days = getUpcomingDays(scheduleWeeks, settings.rotation_weeks, settings.rotation_anchor, 7)
     return days.map((day) => {
-      const dayHours = hours.find((h) => h.weekday === parseDateKey(day.date).getDay())
+      const dayHours = getHoursForDate(day.date)
       const totalMinutes = dayHours
         ? rangeMinutes(dayHours.morning_start, dayHours.morning_end) +
           rangeMinutes(dayHours.afternoon_start, dayHours.afternoon_end)
@@ -69,7 +70,7 @@ export default function AdminAppointments() {
       const pct = totalMinutes > 0 ? Math.min(100, Math.round((bookedMinutes / totalMinutes) * 100)) : 0
       return { ...day, pct }
     })
-  }, [hours, appointments, blocked])
+  }, [scheduleWeeks, settings, getHoursForDate, appointments, blocked])
 
   const handleBlock = async () => {
     if (!blockDate || !blockTime) return

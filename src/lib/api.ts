@@ -3,10 +3,10 @@ import { normalizeTime } from './dates'
 import type {
   Appointment,
   BlockedSlot,
-  DayHours,
   GalleryImage,
   Interval,
   PublicSettings,
+  ScheduleWeekDay,
   Service,
 } from './types'
 
@@ -18,10 +18,11 @@ export async function getPublicSettings(): Promise<PublicSettings> {
   return data as PublicSettings
 }
 
-export async function getBusinessHours(): Promise<DayHours[]> {
+export async function getScheduleWeeks(): Promise<ScheduleWeekDay[]> {
   const { data, error } = await supabase
-    .from('business_hours')
+    .from('schedule_weeks')
     .select('*')
+    .order('week_index')
     .order('weekday')
   if (error) throw error
   return (data ?? []).map((h) => ({
@@ -137,8 +138,37 @@ export async function removeBlockedSlot(id: string) {
   if (error) throw error
 }
 
-export async function updateBusinessHour(weekday: number, patch: Partial<DayHours>) {
-  const { error } = await supabase.from('business_hours').update(patch).eq('weekday', weekday)
+export async function updateScheduleWeekDay(
+  weekIndex: number,
+  weekday: number,
+  patch: Partial<Omit<ScheduleWeekDay, 'week_index' | 'weekday'>>,
+) {
+  const { error } = await supabase
+    .from('schedule_weeks')
+    .update(patch)
+    .eq('week_index', weekIndex)
+    .eq('weekday', weekday)
+  if (error) throw error
+}
+
+export async function addScheduleWeek(weekIndex: number, days: Omit<ScheduleWeekDay, 'week_index'>[]) {
+  const rows = days.map((d) => ({ ...d, week_index: weekIndex }))
+  const { error } = await supabase.from('schedule_weeks').upsert(rows, {
+    onConflict: 'week_index,weekday',
+  })
+  if (error) throw error
+}
+
+export async function removeScheduleWeek(weekIndex: number) {
+  const { error } = await supabase.from('schedule_weeks').delete().eq('week_index', weekIndex)
+  if (error) throw error
+}
+
+export async function updateRotationConfig(rotationWeeks: number, rotationAnchor: string) {
+  const { error } = await supabase
+    .from('settings')
+    .update({ rotation_weeks: rotationWeeks, rotation_anchor: rotationAnchor })
+    .eq('id', true)
   if (error) throw error
 }
 

@@ -5,9 +5,24 @@ import Gallery from './components/Gallery'
 import BookingFlow from './components/BookingFlow'
 import AdminPanel from './components/AdminPanel'
 
+/** Si el dueño abre /admin directamente (p.ej. desde un acceso directo en la
+ * pantalla de inicio del iPhone) entramos directo en el Modo Barbero, sin
+ * pasar por la web pública — así el acceso directo se comporta como una app
+ * propia dedicada a las citas. */
+function isAdminRoute(): boolean {
+  return window.location.pathname.replace(/\/+$/, '') === '/admin'
+}
+
 function AppShell() {
-  const [adminOpen, setAdminOpen] = useState(false)
+  const [adminOpen, setAdminOpen] = useState(isAdminRoute)
   const { loading, error, refresh } = useAppData()
+
+  const closeAdmin = () => {
+    setAdminOpen(false)
+    if (isAdminRoute()) {
+      window.history.replaceState({}, '', '/')
+    }
+  }
 
   if (loading) {
     return (
@@ -33,6 +48,10 @@ function AppShell() {
     )
   }
 
+  if (adminOpen) {
+    return <AdminPanel onClose={closeAdmin} />
+  }
+
   return (
     <div className="min-h-screen max-w-md mx-auto relative pb-10">
       <Header />
@@ -51,8 +70,6 @@ function AppShell() {
         </div>
         <p className="text-[10px] tracking-wide text-white/20">© AZZABARBER · Mataró</p>
       </footer>
-
-      {adminOpen && <AdminPanel onClose={() => setAdminOpen(false)} />}
     </div>
   )
 }

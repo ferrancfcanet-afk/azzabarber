@@ -1,4 +1,4 @@
-import type { DayHours, DayOption, Interval } from './types'
+import type { DayHours, DayOption, Interval, ScheduleWeekDay } from './types'
 
 const WEEKDAYS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb']
 const MONTHS = [
@@ -24,19 +24,45 @@ export function normalizeTime(t: string): string {
   return t.slice(0, 5)
 }
 
+/**
+ * Resuelve el horario de un día concreto según el ciclo de rotación
+ * (semana 0, semana 1, ... y vuelta a empezar cada `rotationWeeks` semanas,
+ * contando desde el lunes `rotationAnchor`).
+ */
+export function resolveDayHours(
+  dateKey: string,
+  weeks: ScheduleWeekDay[],
+  rotationWeeks: number,
+  rotationAnchor: string,
+): DayHours | undefined {
+  const d = parseDateKey(dateKey)
+  const anchor = parseDateKey(rotationAnchor)
+  const diffDays = Math.round((d.getTime() - anchor.getTime()) / 86_400_000)
+  const diffWeeks = Math.floor(diffDays / 7)
+  const n = Math.max(1, rotationWeeks)
+  const weekIndex = ((diffWeeks % n) + n) % n
+  const weekday = d.getDay()
+  return weeks.find((w) => w.week_index === weekIndex && w.weekday === weekday)
+}
+
 /** Próximos N días hábiles según el horario configurado, empezando hoy. */
-export function getUpcomingDays(hours: DayHours[], count = 7): DayOption[] {
+export function getUpcomingDays(
+  weeks: ScheduleWeekDay[],
+  rotationWeeks: number,
+  rotationAnchor: string,
+  count = 7,
+): DayOption[] {
   const days: DayOption[] = []
   const cursor = new Date()
   cursor.setHours(0, 0, 0, 0)
   const today = toDateKey(cursor)
-  const closedWeekdays = new Set(hours.filter((h) => h.closed).map((h) => h.weekday))
 
   let guard = 0
   while (days.length < count && guard < 60) {
     guard++
-    if (!closedWeekdays.has(cursor.getDay())) {
-      const key = toDateKey(cursor)
+    const key = toDateKey(cursor)
+    const dayHours = resolveDayHours(key, weeks, rotationWeeks, rotationAnchor)
+    if (dayHours && !dayHours.closed) {
       days.push({
         date: key,
         weekday: WEEKDAYS[cursor.getDay()],

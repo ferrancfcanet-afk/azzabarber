@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react'
-import { CalendarClock, Image as ImageIcon, Lock, LogOut, ShieldCheck, Sliders, X } from 'lucide-react'
+import {
+  CalendarClock,
+  ChevronLeft,
+  Image as ImageIcon,
+  Lock,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  Sliders,
+  Store,
+  X,
+} from 'lucide-react'
 import { getAdminSession, signInAdmin, signOutAdmin } from '../lib/api'
 import AdminAppointments from './admin/AdminAppointments'
 import AdminHours from './admin/AdminHours'
@@ -11,14 +22,18 @@ interface Props {
   onClose: () => void
 }
 
-type Tab = 'citas' | 'horario' | 'servicios' | 'fotos' | 'ajustes'
+/** Pantalla principal del Modo Barbero: Citas es lo primero que se ve (como
+ * una app de calendario); Ajustes queda como una segunda pantalla debajo,
+ * con sus propias sub-secciones. Así, si el dueño se pone un acceso directo
+ * en el iPhone, lo que abre de primeras son sus citas. */
+type Screen = 'citas' | 'ajustes'
+type SettingsTab = 'horario' | 'servicios' | 'fotos' | 'negocio'
 
-const TABS: { id: Tab; label: string; icon: typeof CalendarClock }[] = [
-  { id: 'citas', label: 'Citas', icon: CalendarClock },
+const SETTINGS_TABS: { id: SettingsTab; label: string; icon: typeof CalendarClock }[] = [
   { id: 'horario', label: 'Horario', icon: Sliders },
   { id: 'servicios', label: 'Servicios', icon: ShieldCheck },
   { id: 'fotos', label: 'Fotos', icon: ImageIcon },
-  { id: 'ajustes', label: 'Ajustes', icon: Sliders },
+  { id: 'negocio', label: 'Negocio', icon: Store },
 ]
 
 export default function AdminPanel({ onClose }: Props) {
@@ -26,7 +41,8 @@ export default function AdminPanel({ onClose }: Props) {
   const [unlocked, setUnlocked] = useState(false)
   const [pinInput, setPinInput] = useState('')
   const [error, setError] = useState(false)
-  const [tab, setTab] = useState<Tab>('citas')
+  const [screen, setScreen] = useState<Screen>('citas')
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('horario')
 
   useEffect(() => {
     getAdminSession()
@@ -48,6 +64,7 @@ export default function AdminPanel({ onClose }: Props) {
     await signOutAdmin()
     setUnlocked(false)
     setPinInput('')
+    setScreen('citas')
   }
 
   return (
@@ -55,10 +72,31 @@ export default function AdminPanel({ onClose }: Props) {
       <div className="max-w-md mx-auto min-h-full px-5 py-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2.5">
-            <ShieldCheck size={18} className="text-violet-light" />
-            <h2 className="font-display text-2xl tracking-wide text-bone">Modo Barbero</h2>
+            {unlocked && screen === 'ajustes' ? (
+              <button
+                onClick={() => setScreen('citas')}
+                className="grid place-items-center w-8 h-8 -ml-1.5 rounded-full text-white/60 active:bg-white/[0.06]"
+                aria-label="Volver a citas"
+              >
+                <ChevronLeft size={20} />
+              </button>
+            ) : (
+              <ShieldCheck size={18} className="text-violet-light" />
+            )}
+            <h2 className="font-display text-2xl tracking-wide text-bone">
+              {!unlocked ? 'Modo Barbero' : screen === 'citas' ? 'Citas' : 'Ajustes'}
+            </h2>
           </div>
           <div className="flex items-center gap-2">
+            {unlocked && screen === 'citas' && (
+              <button
+                onClick={() => setScreen('ajustes')}
+                className="grid place-items-center w-9 h-9 rounded-full border border-white/10 text-white/50"
+                aria-label="Ajustes"
+              >
+                <Settings size={15} />
+              </button>
+            )}
             {unlocked && (
               <button
                 onClick={handleLogout}
@@ -112,15 +150,17 @@ export default function AdminPanel({ onClose }: Props) {
               Entrar
             </button>
           </div>
+        ) : screen === 'citas' ? (
+          <AdminAppointments />
         ) : (
           <div>
             <div className="flex gap-1.5 overflow-x-auto no-scrollbar mb-6 -mx-5 px-5">
-              {TABS.map(({ id, label }) => (
+              {SETTINGS_TABS.map(({ id, label }) => (
                 <button
                   key={id}
-                  onClick={() => setTab(id)}
+                  onClick={() => setSettingsTab(id)}
                   className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
-                    tab === id
+                    settingsTab === id
                       ? 'bg-violet text-white'
                       : 'border border-white/10 text-white/50'
                   }`}
@@ -130,11 +170,10 @@ export default function AdminPanel({ onClose }: Props) {
               ))}
             </div>
 
-            {tab === 'citas' && <AdminAppointments />}
-            {tab === 'horario' && <AdminHours />}
-            {tab === 'servicios' && <AdminServices />}
-            {tab === 'fotos' && <AdminGallery />}
-            {tab === 'ajustes' && <AdminSettings />}
+            {settingsTab === 'horario' && <AdminHours />}
+            {settingsTab === 'servicios' && <AdminServices />}
+            {settingsTab === 'fotos' && <AdminGallery />}
+            {settingsTab === 'negocio' && <AdminSettings />}
           </div>
         )}
       </div>
